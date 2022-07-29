@@ -18,6 +18,7 @@ class CreateController extends Controller
     {
         //
         $tweet = new Tweet;
+        $tweet->user_id = $request->userId();
         $tweet->content = $request->tweet();
         $tweet->save();
         return redirect()->route('tweet.index');
