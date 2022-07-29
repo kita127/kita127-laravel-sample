@@ -29,6 +29,6 @@ class IndexController extends Controller
         // null の場合はModelNotFoundException を投げキャッチされなければ 404 NotFound となる
         // $tweet = Tweet::where('id', $tweetId)->firstOrFail();s
 
-        dd($tweet);
+        return view('tweet.update')->with('tweet', $tweet);
     }
 }
