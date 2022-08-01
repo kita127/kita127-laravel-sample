@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Tweet\Update;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Tweet;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as ExceptionNotFoundHttpException;
-use Symforny\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\Services\TweetService;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class IndexController extends Controller
 {
@@ -16,18 +16,19 @@ class IndexController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, TweetService $tweetService)
     {
-        //
+        
         $tweetId = (int) $request->route('tweetId');
-        $tweet = Tweet::where('id', $tweetId)->first();
-        if (is_null($tweet)) {
-            throw new ExceptionNotFoundHttpException('存在しないつぶやきです');
+        if (!$tweetService->checkOwnTweet($request->user()->id, $tweetId)) {
+            throw new AccessDeniedHttpException();
         }
+
+        //$tweet = Tweet::where('id', $tweetId)->first();
 
         // firstOrFail メソッドを使用すれば null チェックが不要
         // null の場合はModelNotFoundException を投げキャッチされなければ 404 NotFound となる
-        // $tweet = Tweet::where('id', $tweetId)->firstOrFail();s
+        $tweet = Tweet::where('id', $tweetId)->firstOrFail();
 
         return view('tweet.update')->with('tweet', $tweet);
     }
